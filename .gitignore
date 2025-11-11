@@ -30,6 +30,7 @@ wheels/
 output/
 *.csv
 *.json
+!n8n_workflows/*.json
 *.xlsx
 
 # IDE

@@ -1,0 +1,361 @@
+{
+  "name": "LinkedIn AI Agent Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "ai-agent-trigger",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Start AI Campaign",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "ai-agent-linkedin"
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 LinkedIn AI Agent Workflow\n\n**Purpose**: Autonomous LinkedIn outreach with AI-powered message generation\n\n**Flow**:\n1. Trigger webhook with company and parameters\n2. Call AI Agent Python service\n3. AI Agent scrapes profiles\n4. AI generates personalized messages\n5. Returns workflow file for review/sending\n\n**Trigger Webhook**:\n```bash\ncurl -X POST http://localhost:5678/webhook/ai-agent-trigger \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"company\": \"Google\",\n    \"scenario\": \"job_seeker\",\n    \"max_results\": 30,\n    \"message_type\": \"connection\",\n    \"custom_data\": {\n      \"your_role\": \"Software Engineer\",\n      \"years\": \"5\",\n      \"skills\": \"Python, React, AWS\"\n    }\n  }'\n```\n\n**Requirements**:\n- AI Agent service running: `python ai_agent.py`\n- Or use Python subprocess node\n- OpenAI/Anthropic API key configured",
+        "height": 464.34782608695656,
+        "width": 526.5217391304348
+      },
+      "id": "workflow-docs",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, -100]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "company",
+              "value": "={{ $json.body.company }}"
+            },
+            {
+              "name": "scenario",
+              "value": "={{ $json.body.scenario || 'job_seeker' }}"
+            },
+            {
+              "name": "max_results",
+              "value": "={{ $json.body.max_results || 50 }}"
+            },
+            {
+              "name": "message_type",
+              "value": "={{ $json.body.message_type || 'connection' }}"
+            },
+            {
+              "name": "custom_data",
+              "value": "={{ JSON.stringify($json.body.custom_data || {}) }}"
+            }
+          ]
+        }
+      },
+      "id": "parse-params",
+      "name": "Parse Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "command": "cd /home/user/Search_linkedin_hrs && python ai_agent.py --company \"={{ $json.company }}\" --scenario {{ $json.scenario }} --max-results {{ $json.max_results }} --message-type {{ $json.message_type }} --role \"{{ JSON.parse($json.custom_data).your_role || 'Professional' }}\" --years \"{{ JSON.parse($json.custom_data).years || '5' }}\" --skills \"{{ JSON.parse($json.custom_data).skills || 'various skills' }}\""
+      },
+      "id": "run-ai-agent",
+      "name": "Run AI Agent",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/ai-agent/run",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {
+          "bodyParametersJson": "={\n  \"company\": \"{{ $json.company }}\",\n  \"scenario\": \"{{ $json.scenario }}\",\n  \"max_results\": {{ $json.max_results }},\n  \"message_type\": \"{{ $json.message_type }}\",\n  \"custom_data\": {{ $json.custom_data }}\n}"
+        }
+      },
+      "id": "call-ai-agent-api",
+      "name": "Call AI Agent API (Alternative)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [690, 460],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "💡 **Alternative Execution Methods**\n\n**Option 1**: Execute Command Node\n- Runs Python script directly\n- Requires Python environment on n8n server\n- Enabled by default\n\n**Option 2**: HTTP Request to API\n- Requires separate AI Agent API service\n- Better for production/distributed systems\n- Disabled by default\n\n**Option 3**: Python Subprocess\n- Use Code node with Python subprocess\n- More control over execution",
+        "height": 297.0652173913044,
+        "width": 369.0434782608695
+      },
+      "id": "execution-note",
+      "name": "Execution Options",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [640, 580]
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {}
+      },
+      "id": "parse-output",
+      "name": "Parse AI Agent Output",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "success"
+            }
+          ]
+        }
+      },
+      "id": "check-success",
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract campaign results and prepare for next steps\nconst output = $input.item.json;\n\nreturn {\n  campaign_id: output.campaign_id,\n  company: output.company,\n  profiles_count: output.profiles_scraped,\n  messages_count: output.messages_generated,\n  avg_message_length: output.avg_message_length,\n  files: output.files_created,\n  workflow_file: output.files_created.find(f => f.includes('workflow')),\n  messages_file: output.files_created.find(f => f.includes('messages')),\n  report_file: output.files_created.find(f => f.includes('report')),\n  ai_powered: output.ai_powered\n};"
+      },
+      "id": "process-results",
+      "name": "Process Campaign Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1350, 200]
+    },
+    {
+      "parameters": {
+        "filePath": "={{ $json.workflow_file }}",
+        "options": {}
+      },
+      "id": "read-workflow",
+      "name": "Read Workflow File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [1570, 200]
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {}
+      },
+      "id": "parse-workflow",
+      "name": "Parse Workflow JSON",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [1790, 200]
+    },
+    {
+      "parameters": {
+        "content": "=Campaign: {{ $json.campaign_id }}\nCompany: {{ $json.company }}\nProfiles: {{ $json.profiles_count }}\nMessages: {{ $json.messages_count }}\nAvg Length: {{ $json.avg_message_length }} chars\nAI-Powered: {{ $json.ai_powered }}\n\nWorkflow File: {{ $json.workflow_file }}\nMessages File: {{ $json.messages_file }}\nReport File: {{ $json.report_file }}\n\nStatus: ✅ Ready for review and sending!",
+        "channelName": "linkedin-campaigns"
+      },
+      "id": "slack-notify",
+      "name": "Notify Slack (Optional)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [1790, 350],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "=LinkedIn Campaign Complete: {{ $json.company }}",
+        "text": "=Campaign ID: {{ $json.campaign_id }}\n\nResults:\n- Company: {{ $json.company }}\n- Profiles Found: {{ $json.profiles_count }}\n- Messages Generated: {{ $json.messages_generated }}\n- AI-Powered: {{ $json.ai_powered }}\n\nFiles Created:\n- Workflow: {{ $json.workflow_file }}\n- Messages: {{ $json.messages_file }}\n- Report: {{ $json.report_file }}\n\nNext Steps:\n1. Review the generated messages\n2. Import workflow file to send messages\n3. Track response rates\n\nThe AI agent has completed your campaign!"
+      },
+      "id": "email-notify",
+      "name": "Email Notification (Optional)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1790, 500],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"campaign_id\": \"{{ $json.campaign_id }}\",\n  \"company\": \"{{ $json.company }}\",\n  \"results\": {\n    \"profiles_scraped\": {{ $json.profiles_count }},\n    \"messages_generated\": {{ $json.messages_count }},\n    \"avg_message_length\": {{ $json.avg_message_length }},\n    \"ai_powered\": {{ $json.ai_powered }}\n  },\n  \"files\": {\n    \"workflow\": \"{{ $json.workflow_file }}\",\n    \"messages\": \"{{ $json.messages_file }}\",\n    \"report\": \"{{ $json.report_file }}\"\n  },\n  \"message\": \"Campaign completed successfully! Check the files for generated messages.\"\n}"
+      },
+      "id": "webhook-response-success",
+      "name": "Webhook Response: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2010, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"Campaign failed\",\n  \"details\": {{ JSON.stringify($json) }}\n}",
+        "responseCode": 500
+      },
+      "id": "webhook-response-error",
+      "name": "Webhook Response: Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1350, 400]
+    },
+    {
+      "parameters": {
+        "content": "## 📧 Notification Options\n\nEnable these nodes to get notified when campaigns complete:\n\n**Slack**: Post to #linkedin-campaigns channel\n**Email**: Send summary to your email\n\nBoth are disabled by default. Configure credentials and enable as needed.",
+        "height": 246.95652173913044,
+        "width": 297.52173913043485
+      },
+      "id": "notification-note",
+      "name": "Notification Options",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1740, 620]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/health",
+        "options": {}
+      },
+      "id": "health-check",
+      "name": "Health Check: AI Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [470, 460]
+    },
+    {
+      "parameters": {
+        "content": "## 🔍 Pre-Flight Check\n\nOptional health check node to verify:\n- Message service is running\n- AI APIs are accessible\n- System is ready\n\nDisabled by default to avoid failures.",
+        "height": 197.17391304347825,
+        "width": 280
+      },
+      "id": "health-note",
+      "name": "Health Check Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [420, 600]
+    }
+  ],
+  "connections": {
+    "Webhook: Start AI Campaign": {
+      "main": [
+        [
+          {
+            "node": "Parse Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Parameters": {
+      "main": [
+        [
+          {
+            "node": "Run AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Agent Output": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Process Campaign Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Campaign Results": {
+      "main": [
+        [
+          {
+            "node": "Read Workflow File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack (Optional)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Notification (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Workflow File": {
+      "main": [
+        [
+          {
+            "node": "Parse Workflow JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Workflow JSON": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response: Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "linkedin-ai-agent-workflow"
+  },
+  "tags": []
+}
