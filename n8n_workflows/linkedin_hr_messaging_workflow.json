@@ -1,0 +1,275 @@
+{
+  "name": "LinkedIn HR Messaging Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "linkedin-hr-outreach",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "linkedin-hr-webhook"
+    },
+    {
+      "parameters": {
+        "filePath": "/data/linkedin_hr_results.json",
+        "options": {}
+      },
+      "id": "read-scraper-output",
+      "name": "Read Scraper Output",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "location",
+              "value": "={{ $json.location }}"
+            },
+            {
+              "name": "profile_url",
+              "value": "={{ $json.profile_url }}"
+            },
+            {
+              "name": "company",
+              "value": "={{ $json.title.split(' at ')[1] || 'the company' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "parse-profiles",
+      "name": "Parse HR Profiles",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Message Generator Function\nconst scenarios = {\n  job_seeker: {\n    greetings: ['Hi {name}', 'Hello {name}', 'Hi there {name}'],\n    intros: [\n      'I came across your profile while researching {company} and was impressed by your work in talent acquisition.',\n      \"I noticed you're leading talent acquisition at {company}, and I wanted to reach out.\",\n      'Your experience in HR at {company} caught my attention.'\n    ],\n    value_props: [\n      \"I'm a Software Engineer with 5+ years of experience in full-stack development, and I'm actively exploring new opportunities.\",\n      'As a developer specializing in cloud architecture and modern web technologies, I\\'m interested in learning more about opportunities at {company}.',\n      'I bring extensive experience in building scalable applications and am particularly drawn to {company}\\'s mission.'\n    ],\n    ctas: [\n      'Would you be open to a brief conversation about current or future opportunities?',\n      \"I'd love to connect and learn more about your team's needs.\",\n      'Would you have 15 minutes for a quick chat about potential openings?'\n    ],\n    closings: [\n      'Thanks for your time, and I look forward to connecting!',\n      'Looking forward to hearing from you!',\n      'Thank you for considering my request!'\n    ]\n  },\n  networking: {\n    greetings: ['Hi {name}', 'Hello {name}'],\n    intros: [\n      'I noticed we both work in the tech space and wanted to connect.',\n      'Your work at {company} has been really impressive, especially in talent development.',\n      \"I've been following {company}'s innovative approach to hiring and wanted to reach out.\"\n    ],\n    value_props: [\n      \"I'm always looking to expand my network with talented HR professionals.\",\n      \"I'd love to exchange insights about current trends in talent acquisition.\",\n      'I think we could have some interesting conversations about the evolving HR landscape.'\n    ],\n    ctas: [\n      'Would you be open to connecting?',\n      \"I'd love to add you to my professional network.\",\n      \"Let's connect and stay in touch!\"\n    ],\n    closings: [\n      'Best regards!',\n      'Thanks for connecting!',\n      'Looking forward to staying in touch!'\n    ]\n  }\n};\n\nfunction selectRandom(array) {\n  return array[Math.floor(Math.random() * array.length)];\n}\n\nfunction generateMessage(profile, scenario = 'job_seeker') {\n  const templates = scenarios[scenario] || scenarios.job_seeker;\n  const firstName = profile.name.split(' ')[0];\n  const company = profile.company || 'your company';\n  \n  const greeting = selectRandom(templates.greetings).replace('{name}', firstName);\n  const intro = selectRandom(templates.intros).replace('{company}', company);\n  const valueProp = selectRandom(templates.value_props).replace('{company}', company);\n  const cta = selectRandom(templates.ctas).replace('{company}', company);\n  const closing = selectRandom(templates.closings);\n  \n  const message = `${greeting},\\n\\n${intro}\\n\\n${valueProp}\\n\\n${cta}\\n\\n${closing}`;\n  \n  return {\n    recipient_name: profile.name,\n    recipient_title: profile.title,\n    recipient_url: profile.profile_url,\n    recipient_location: profile.location,\n    message: message,\n    char_count: message.length,\n    scenario: scenario,\n    generated_at: new Date().toISOString()\n  };\n}\n\n// Process each profile\nconst profile = $input.item.json;\nconst scenario = $node[\"Webhook Trigger\"].json.body.scenario || 'job_seeker';\nconst messageData = generateMessage(profile, scenario);\n\nreturn messageData;"
+      },
+      "id": "generate-messages",
+      "name": "Generate Personalized Messages",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.char_count }}",
+              "operation": "smaller",
+              "value2": "1500"
+            }
+          ]
+        }
+      },
+      "id": "filter-valid-messages",
+      "name": "Filter Valid Messages",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// OpenAI GPT-4 Message Enhancement (Optional)\n// This node can be replaced with actual OpenAI API call\n\nconst profile = $input.item.json;\nconst baseMessage = profile.message;\n\n// TODO: Replace with actual OpenAI API call\n// For now, just return the base message with AI enhancement flag\n\nreturn {\n  ...profile,\n  ai_enhanced: false,\n  enhancement_note: 'Connect OpenAI node for AI enhancement'\n};"
+      },
+      "id": "ai-enhancement",
+      "name": "AI Message Enhancement (Optional)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 150]
+    },
+    {
+      "parameters": {
+        "filePath": "/data/generated_messages.json",
+        "options": {}
+      },
+      "id": "save-messages",
+      "name": "Save Generated Messages",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.linkedin.com/v2/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "linkedInOAuth2Api",
+        "options": {}
+      },
+      "id": "send-to-linkedin",
+      "name": "Send to LinkedIn (Optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1250, 450],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "📧 **LinkedIn HR Messaging Workflow**\n\nThis workflow:\n1. Receives scraped HR data\n2. Generates personalized messages\n3. Optionally enhances with AI\n4. Saves for manual sending or auto-sends\n\n**Trigger:**\n- Webhook: POST to /webhook/linkedin-hr-outreach\n- Payload: { \"scenario\": \"job_seeker\" | \"networking\" }\n\n**Output:**\n- JSON file with all generated messages\n- Ready to import or send\n\n**Integration:**\n- Connect OpenAI node for AI enhancement\n- Connect LinkedIn API for auto-sending\n- Use with caution to avoid spam!"
+      },
+      "id": "workflow-note",
+      "name": "Workflow Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [250, 100]
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {}
+      },
+      "id": "convert-to-json",
+      "name": "Convert to JSON",
+      "type": "n8n-nodes-base.convertToJson",
+      "typeVersion": 1,
+      "position": [450, 450]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5000/generate-message",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {
+          "bodyParametersJson": "={{ JSON.stringify($json) }}"
+        }
+      },
+      "id": "python-message-service",
+      "name": "Python Message Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [850, 450]
+    },
+    {
+      "parameters": {
+        "content": "🔄 **Alternative Flow**\n\nUse this path to call the Python message generator service:\n\n1. Start Python Flask API:\n   `python message_service.py`\n\n2. This node calls the API to generate messages using the full Python templates\n\n3. More customizable than in-workflow generation"
+      },
+      "id": "alternative-note",
+      "name": "Alternative: Use Python Service",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [650, 550]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Scraper Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Scraper Output": {
+      "main": [
+        [
+          {
+            "node": "Parse HR Profiles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse HR Profiles": {
+      "main": [
+        [
+          {
+            "node": "Generate Personalized Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Personalized Messages": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Message Enhancement (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Messages": {
+      "main": [
+        [
+          {
+            "node": "Save Generated Messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send to LinkedIn (Optional)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to JSON": {
+      "main": [
+        [
+          {
+            "node": "Python Message Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Python Message Service": {
+      "main": [
+        [
+          {
+            "node": "Save Generated Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "linkedin-hr-messaging"
+  },
+  "tags": []
+}
