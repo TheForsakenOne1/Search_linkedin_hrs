@@ -42,6 +42,7 @@ output/
 
 # Logs
 *.log
+logs/
 
 # Browser drivers
 chromedriver

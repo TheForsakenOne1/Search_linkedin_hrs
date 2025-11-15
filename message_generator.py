@@ -200,14 +200,25 @@ class MessageGenerator:
 
     def _generate_ai_message(self, profile, scenario, custom_data):
         """Generate message using AI (OpenAI/Anthropic)"""
-        # This is a placeholder for AI integration
-        # You can integrate with OpenAI GPT-4, Anthropic Claude, etc.
+        try:
+            # Import AI generator (only if needed)
+            from ai_message_generator import AIMessageGenerator
 
-        prompt = self._build_ai_prompt(profile, scenario, custom_data)
+            ai_generator = AIMessageGenerator()
+            message_data = ai_generator.generate_message(
+                profile,
+                scenario=scenario,
+                custom_data=custom_data,
+                message_type='connection'
+            )
+            return message_data
 
-        # TODO: Implement actual AI API call
-        # For now, fall back to template generation
-        return self._generate_template_message(profile, scenario, custom_data)
+        except ImportError:
+            print("⚠ AI message generator not available, using templates")
+            return self._generate_template_message(profile, scenario, custom_data)
+        except Exception as e:
+            print(f"⚠ AI generation failed ({str(e)}), falling back to templates")
+            return self._generate_template_message(profile, scenario, custom_data)
 
     def _build_ai_prompt(self, profile, scenario, custom_data):
         """Build prompt for AI message generation"""

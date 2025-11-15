@@ -370,8 +370,12 @@ Search_linkedin_hrs/
 │   └── n8n_workflows/
 │       └── linkedin_hr_messaging_workflow.json  # n8n workflow template
 │
-├── Utilities & Examples
+├── Utilities & Quality Assurance
+│   ├── validation.py                # Input validation utilities
+│   ├── logger.py                    # Logging system
 │   ├── utils.py                     # Environment validation utilities
+│   ├── demo.py                      # Comprehensive demo script
+│   ├── tests.py                     # Unit test suite
 │   ├── example_usage.py             # Code examples
 │   └── setup.sh                     # Automated setup script
 │
@@ -391,6 +395,107 @@ Search_linkedin_hrs/
     ├── linkedin_hr_*.json           # Scraped profiles (JSON)
     ├── messages_*.json              # Generated messages
     └── workflow_*.json              # n8n workflow files
+```
+
+## Testing & Validation
+
+### Run Comprehensive Demo
+
+Test all features without scraping:
+
+```bash
+python demo.py
+```
+
+This interactive demo checks:
+- Environment configuration
+- LinkedIn credentials
+- AI setup (if enabled)
+- Message generation
+- Data export
+- Input validation
+
+**Quick check:**
+```bash
+python demo.py --quick
+```
+
+### Run Test Suite
+
+Comprehensive unit tests for all components:
+
+```bash
+python tests.py
+```
+
+Tests include:
+- Input validation (company names, emails, URLs)
+- Message generation (templates and AI)
+- Data export (CSV, JSON, Excel)
+- Configuration loading
+- Logging functionality
+
+### Validate Environment
+
+Check your setup:
+
+```bash
+python utils.py --check
+```
+
+Verifies:
+- Python version (3.8+)
+- Required packages installed
+- .env file exists
+- LinkedIn credentials configured
+- Output directory writable
+
+### Input Validation
+
+The scraper includes comprehensive input validation:
+
+```python
+from validation import validate_company_name, validate_scenario
+
+# Validate company name
+is_valid, error = validate_company_name("Google")
+if not is_valid:
+    print(f"Error: {error}")
+
+# Validate scenario
+is_valid, error = validate_scenario("job_seeker")
+```
+
+Available validators:
+- `validate_company_name()` - Company name validation
+- `validate_email()` - Email format validation
+- `validate_linkedin_url()` - LinkedIn URL validation
+- `validate_scenario()` - Message scenario validation
+- `validate_max_results()` - Result count validation
+- `validate_api_key()` - AI API key validation
+- `validate_profile()` - Profile data validation
+- `validate_credentials()` - LinkedIn credentials check
+- `validate_environment()` - Full environment check
+
+### Logging
+
+Built-in logging for debugging and monitoring:
+
+```python
+from logger import get_logger
+
+logger = get_logger('my_campaign')
+logger.info("Starting campaign...")
+logger.log_scraping_start("Google", 50)
+```
+
+Logs are saved to `logs/` directory with timestamps.
+
+**Enable verbose logging:**
+```bash
+# Set in your script
+from logger import setup_logging
+logger = setup_logging(verbose=True)
 ```
 
 ## Advanced Usage
