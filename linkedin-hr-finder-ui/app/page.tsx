@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Linkedin, Github, ExternalLink } from 'lucide-react'
+import { Linkedin, Github, ExternalLink, Sparkles, Zap, Shield } from 'lucide-react'
 import type { SearchParams, SearchResponse } from '@/lib/types'
 import SearchForm from '@/components/SearchForm'
 import ResultsDisplay from '@/components/ResultsDisplay'
@@ -48,95 +48,164 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-stripe-50">
+      {/* Header - Stripe Style */}
+      <header className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="bg-linkedin-500 p-2 rounded-lg mr-3">
-                <Linkedin className="h-8 w-8 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-stripe-500 to-stripe-600 p-2.5 rounded-xl shadow-stripe">
+                <Linkedin className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">LinkedIn HR Finder</h1>
-                <p className="text-sm text-gray-600">Find & message HR contacts with AI-powered personalization</p>
+                <h1 className="text-xl font-semibold text-gray-900">LinkedIn HR Finder</h1>
+                <p className="text-sm text-gray-500">AI-powered professional networking</p>
               </div>
             </div>
             <a
               href="https://github.com/TheForsakenOne1/Search_linkedin_hrs"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+              className="hidden md:flex items-center space-x-2 text-sm text-gray-600 hover:text-stripe-600 transition-colors"
             >
-              <Github className="h-5 w-5 mr-2" />
-              <span className="text-sm font-medium">View on GitHub</span>
-              <ExternalLink className="h-3 w-3 ml-1" />
+              <Github className="h-4 w-4" />
+              <span className="font-medium">View on GitHub</span>
+              <ExternalLink className="h-3 w-3" />
             </a>
           </div>
         </div>
       </header>
 
+      {/* Hero Section - Stripe Style */}
+      <div className="bg-gradient-to-br from-stripe-500 via-stripe-600 to-stripe-700 text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 animate-fade-in">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-sm font-medium">Powered by GPT-4 & Google Search</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 animate-slide-up">
+              Find HR contacts,<br />
+              <span className="text-stripe-200">send personalized messages</span>
+            </h2>
+            <p className="text-lg text-stripe-100 mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Search any company and get AI-generated outreach messages in seconds.
+              No database. No complexity. Just results.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 text-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-stripe-200" />
+                <span>100 free searches/day</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Sparkles className="h-5 w-5 text-stripe-200" />
+                <span>AI personalization</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Shield className="h-5 w-5 text-stripe-200" />
+                <span>Privacy-first</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Search Form */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Search Parameters</h2>
+          <div className="lg:col-span-1 space-y-6">
+            <div className="stripe-card p-6 sticky top-6 animate-scale-in">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Search</h2>
+                <span className="stripe-badge bg-stripe-50 text-stripe-700 border border-stripe-200">
+                  Quick start
+                </span>
+              </div>
               <SearchForm onSearch={handleSearch} isLoading={isLoading} />
             </div>
 
-            {/* Info Card */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-              <h3 className="text-sm font-semibold text-blue-900 mb-2">💡 How it works</h3>
-              <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
-                <li>Enter company name</li>
-                <li>Optionally add your profile & projects</li>
-                <li>Click "Find HR Contacts"</li>
-                <li>Review AI-generated messages</li>
-                <li>Copy & send on LinkedIn</li>
-              </ol>
+            {/* Info Card - Stripe Style */}
+            <div className="stripe-card p-5 border-l-4 border-stripe-500 animate-scale-in" style={{ animationDelay: '0.1s' }}>
+              <div className="flex items-start space-x-3">
+                <div className="bg-stripe-100 rounded-lg p-2">
+                  <Sparkles className="h-5 w-5 text-stripe-600" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">How it works</h3>
+                  <ol className="text-xs text-gray-600 space-y-1.5 list-decimal list-inside">
+                    <li>Enter company name</li>
+                    <li>Add your profile (optional)</li>
+                    <li>Get AI-generated messages</li>
+                    <li>Copy & send on LinkedIn</li>
+                  </ol>
+                </div>
+              </div>
             </div>
 
-            {/* Stats Card */}
-            <div className="bg-gradient-to-br from-linkedin-50 to-linkedin-100 border border-linkedin-200 rounded-lg p-4 mt-4">
-              <h3 className="text-sm font-semibold text-linkedin-900 mb-2">✨ Features</h3>
-              <ul className="text-xs text-linkedin-800 space-y-1">
-                <li>✅ 100 free searches/day</li>
-                <li>✅ AI-personalized messages</li>
-                <li>✅ No database required</li>
-                <li>✅ Export to JSON/CSV</li>
-                <li>✅ One-click LinkedIn access</li>
-              </ul>
+            {/* Features Card */}
+            <div className="stripe-card p-5 bg-gradient-to-br from-stripe-50 to-white animate-scale-in" style={{ animationDelay: '0.2s' }}>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                <Zap className="h-4 w-4 mr-2 text-stripe-600" />
+                Platform features
+              </h3>
+              <div className="space-y-2">
+                {[
+                  'Google Search API integration',
+                  'GPT-4 message generation',
+                  'Export to JSON/CSV',
+                  'No database required',
+                  'Privacy-focused design'
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center text-xs text-gray-600">
+                    <div className="h-1.5 w-1.5 rounded-full bg-stripe-500 mr-2"></div>
+                    {feature}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Right Column - Results */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <h3 className="text-sm font-semibold text-red-900 mb-1">Error</h3>
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="stripe-card p-5 border-l-4 border-error-500 bg-error-50 animate-slide-up">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-error-100 rounded-lg p-2">
+                    <ExternalLink className="h-5 w-5 text-error-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-error-900 mb-1">Error occurred</h3>
+                    <p className="text-sm text-error-700">{error}</p>
+                  </div>
+                </div>
               </div>
             )}
 
-            <ResultsDisplay results={results} />
+            <div className="animate-fade-in">
+              <ResultsDisplay results={results} />
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>© 2025 LinkedIn HR Finder. Built with Next.js & n8n.</p>
-            <div className="flex items-center mt-4 md:mt-0">
-              <span className="mr-4">Powered by:</span>
-              <div className="flex gap-3">
-                <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium">Google Search API</span>
-                <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium">OpenAI GPT-4</span>
-                <span className="bg-gray-100 px-3 py-1 rounded-full text-xs font-medium">n8n</span>
-              </div>
+      {/* Footer - Stripe Style */}
+      <footer className="bg-white border-t border-gray-100 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-sm text-gray-500 mb-4 md:mb-0">
+              © 2025 LinkedIn HR Finder. Built with Next.js, n8n & AI.
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-xs text-gray-400">Powered by</span>
+              {['Google', 'OpenAI', 'n8n'].map((tech) => (
+                <span
+                  key={tech}
+                  className="stripe-badge bg-gray-50 text-gray-600 border border-gray-200 text-xs"
+                >
+                  {tech}
+                </span>
+              ))}
             </div>
           </div>
         </div>
