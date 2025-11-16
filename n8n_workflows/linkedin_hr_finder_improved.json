@@ -1,0 +1,517 @@
+{
+  "name": "LinkedIn HR Finder - Improved (Free Sources)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "linkedin-hr-finder",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Start Search",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "linkedin-hr-finder"
+    },
+    {
+      "parameters": {
+        "content": "# 🚀 LinkedIn HR Finder - Improved Workflow\n\n## Features:\n✅ **Simple Input**: Just enter company name\n✅ **Free Sources**: Google Custom Search + Proxycurl\n✅ **AI-Powered**: GPT-4/Claude message generation\n✅ **Project Integration**: Auto-includes your portfolio\n✅ **Complete Profiles**: Name, title, location, LinkedIn URL\n✅ **Ready-to-Send**: Personalized messages for each contact\n\n## How to Use:\n```bash\ncurl -X POST http://localhost:5678/webhook/linkedin-hr-finder \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"company_name\": \"Google\",\n    \"max_results\": 20,\n    \"your_name\": \"Your Name\",\n    \"your_role\": \"Software Engineer\",\n    \"your_experience\": \"5 years\",\n    \"your_skills\": \"Python, React, AWS, Docker\",\n    \"your_projects\": [\n      {\"name\": \"E-Commerce Platform\", \"description\": \"Built scalable platform serving 100K users\", \"tech\": \"React, Node.js, MongoDB\"},\n      {\"name\": \"AI Chatbot\", \"description\": \"Developed intelligent customer service bot\", \"tech\": \"Python, OpenAI, FastAPI\"}\n    ]\n  }'\n```\n\n## Free API Limits:\n- Google Custom Search: 100 searches/day\n- Proxycurl: 10-15 free credits (3 credits per employee)\n- OpenAI/Anthropic: Your API key required",
+        "height": 580,
+        "width": 520
+      },
+      "id": "workflow-docs",
+      "name": "📚 Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [220, -320]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "company_name",
+              "value": "={{ $json.body.company_name }}"
+            },
+            {
+              "name": "max_results",
+              "value": "={{ $json.body.max_results || 20 }}"
+            },
+            {
+              "name": "your_name",
+              "value": "={{ $json.body.your_name || 'Professional' }}"
+            },
+            {
+              "name": "your_role",
+              "value": "={{ $json.body.your_role || 'Software Engineer' }}"
+            },
+            {
+              "name": "your_experience",
+              "value": "={{ $json.body.your_experience || '5 years' }}"
+            },
+            {
+              "name": "your_skills",
+              "value": "={{ $json.body.your_skills || 'Full-stack development' }}"
+            },
+            {
+              "name": "your_projects",
+              "value": "={{ JSON.stringify($json.body.your_projects || []) }}"
+            },
+            {
+              "name": "search_method",
+              "value": "={{ $json.body.search_method || 'google' }}"
+            }
+          ]
+        }
+      },
+      "id": "parse-input",
+      "name": "Parse Input Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/customsearch/v1?key={{ $credentials.googleCustomSearchApi.apiKey }}&cx={{ $credentials.googleCustomSearchApi.searchEngineId }}&q=site:linkedin.com/in+{{ $json.company_name }}+(recruiter+OR+\"talent+acquisition\"+OR+\"HR+manager\"+OR+\"hiring+manager\"+OR+\"people+operations\"+OR+\"human+resources\")&num=10",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCustomSearchApi",
+        "options": {}
+      },
+      "id": "google-search-linkedin",
+      "name": "Google: Search LinkedIn Profiles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [690, 200]
+    },
+    {
+      "parameters": {
+        "content": "## 🔍 Method 1: Google Custom Search API\n\n**Pros:**\n- 100 free searches per day\n- No login required\n- Fast and reliable\n- Finds public profiles\n\n**Setup:**\n1. Get API key: console.cloud.google.com\n2. Create Custom Search Engine\n3. Add credentials to n8n\n\n**Alternative:** Use Method 2 (Proxycurl) if quota exceeded",
+        "height": 280,
+        "width": 320
+      },
+      "id": "google-search-note",
+      "name": "Google Search Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [640, -120]
+    },
+    {
+      "parameters": {
+        "url": "=https://nubela.co/proxycurl/api/linkedin/company/employees/?linkedin_company_profile_url=https://www.linkedin.com/company/{{ $json.company_name }}&page_size={{ $json.max_results }}&employment_status=current&role_search=talent%20acquisition%7Crecruiter%7Chr%20manager%7Chiring%20manager",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "proxycurlApi",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "proxycurl-employee-list",
+      "name": "Proxycurl: Get Employee List",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [690, 400],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 🔍 Method 2: Proxycurl API\n\n**Pros:**\n- 10-15 free trial credits\n- Rich profile data\n- Employee listing by company\n- Role filtering\n\n**Costs:**\n- 3 credits per employee returned\n- Employee Count: 1 credit\n- Full Profile: 1 credit\n\n**Setup:**\n1. Sign up at nubela.co/proxycurl\n2. Get API key\n3. Add credentials to n8n\n\n*Disabled by default - enable as alternative*",
+        "height": 330,
+        "width": 320
+      },
+      "id": "proxycurl-note",
+      "name": "Proxycurl Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [640, 520]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract LinkedIn profile URLs from Google search results\nconst items = $input.all();\nconst profiles = [];\n\nfor (const item of items) {\n  if (item.json.items) {\n    for (const result of item.json.items) {\n      const url = result.link;\n      const title = result.title;\n      const snippet = result.snippet;\n      \n      // Extract name from title (usually \"Name - Title | LinkedIn\")\n      const nameParts = title.split(' - ')[0] || title.split(' | ')[0];\n      const name = nameParts.trim();\n      \n      // Try to extract job title\n      let jobTitle = '';\n      if (title.includes(' - ')) {\n        const titleParts = title.split(' - ');\n        if (titleParts.length > 1) {\n          jobTitle = titleParts[1].split(' | ')[0].trim();\n        }\n      }\n      \n      // Extract from snippet if not found in title\n      if (!jobTitle && snippet) {\n        const snippetLower = snippet.toLowerCase();\n        if (snippetLower.includes('recruiter') || \n            snippetLower.includes('talent') || \n            snippetLower.includes('hr') ||\n            snippetLower.includes('hiring')) {\n          jobTitle = snippet.split('.')[0].trim();\n        }\n      }\n      \n      profiles.push({\n        name: name,\n        title: jobTitle || 'HR Professional',\n        profile_url: url,\n        snippet: snippet,\n        source: 'google_search'\n      });\n    }\n  }\n}\n\nreturn profiles.map(p => ({ json: p }));"
+      },
+      "id": "parse-google-results",
+      "name": "Parse Google Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://nubela.co/proxycurl/api/v2/linkedin?url={{ encodeURIComponent($json.profile_url) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "proxycurlApi",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "enrich-with-proxycurl",
+      "name": "Proxycurl: Enrich Profile (Optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1130, 100],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 💎 Profile Enrichment (Optional)\n\n**What it does:**\n- Gets detailed profile data\n- Email, phone (if public)\n- Work history\n- Skills and education\n\n**Cost:** 1 credit per profile\n\n*Disabled by default to save credits*\n*Enable if you need detailed data*",
+        "height": 240,
+        "width": 300
+      },
+      "id": "enrichment-note",
+      "name": "Enrichment Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1080, -100]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "type": "string",
+              "value": "={{ $json.name || $json.full_name || 'Unknown' }}"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title || $json.occupation || $json.headline || 'HR Professional' }}"
+            },
+            {
+              "id": "profile_url",
+              "name": "profile_url",
+              "type": "string",
+              "value": "={{ $json.profile_url || $json.public_identifier }}"
+            },
+            {
+              "id": "location",
+              "name": "location",
+              "type": "string",
+              "value": "={{ $json.location || $json.city || $json.country || 'Unknown' }}"
+            },
+            {
+              "id": "company",
+              "name": "company",
+              "type": "string",
+              "value": "={{ $('Parse Input Parameters').item.json.company_name }}"
+            }
+          ]
+        }
+      },
+      "id": "normalize-profile",
+      "name": "Normalize Profile Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1130, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.title.toLowerCase() }}",
+              "operation": "regex",
+              "value2": "(recruit|talent|hr|hiring|people|human resources)"
+            }
+          ]
+        }
+      },
+      "id": "filter-hr-roles",
+      "name": "Filter HR Roles",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1350, 200]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a professional outreach specialist. Create a highly personalized, warm, and compelling LinkedIn connection message.\n\n**Target Profile:**\n- Name: {{ $json.name }}\n- Title: {{ $json.title }}\n- Company: {{ $json.company }}\n- Location: {{ $json.location }}\n\n**Your Profile:**\n- Name: {{ $('Parse Input Parameters').item.json.your_name }}\n- Role: {{ $('Parse Input Parameters').item.json.your_role }}\n- Experience: {{ $('Parse Input Parameters').item.json.your_experience }}\n- Skills: {{ $('Parse Input Parameters').item.json.your_skills }}\n\n**Your Projects:**\n{{ JSON.parse($('Parse Input Parameters').item.json.your_projects).map(p => `• ${p.name}: ${p.description} (Tech: ${p.tech})`).join('\\n') }}\n\n**Requirements:**\n1. Address them by first name\n2. Show genuine interest in their role/company\n3. Briefly mention 1-2 relevant projects that would interest them\n4. Make it conversational, not salesy\n5. Include a clear but soft call-to-action\n6. Keep it under 300 characters for connection request OR provide a longer follow-up message version\n7. Sound human and authentic\n\n**Output Format:**\nProvide TWO versions:\n\n**Connection Request** (under 300 chars):\n[Short version]\n\n**Follow-up Message** (longer, after they accept):\n[Detailed version with project highlights]"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "ai-generate-message-openai",
+      "name": "AI: Generate Message (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [1570, 120]
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-sonnet-20241022",
+        "text": "=You are a professional outreach specialist. Create a highly personalized, warm, and compelling LinkedIn connection message.\n\n**Target Profile:**\n- Name: {{ $json.name }}\n- Title: {{ $json.title }}\n- Company: {{ $json.company }}\n- Location: {{ $json.location }}\n\n**Your Profile:**\n- Name: {{ $('Parse Input Parameters').item.json.your_name }}\n- Role: {{ $('Parse Input Parameters').item.json.your_role }}\n- Experience: {{ $('Parse Input Parameters').item.json.your_experience }}\n- Skills: {{ $('Parse Input Parameters').item.json.your_skills }}\n\n**Your Projects:**\n{{ JSON.parse($('Parse Input Parameters').item.json.your_projects).map(p => `• ${p.name}: ${p.description} (Tech: ${p.tech})`).join('\\n') }}\n\n**Requirements:**\n1. Address them by first name\n2. Show genuine interest in their role/company\n3. Briefly mention 1-2 relevant projects that would interest them\n4. Make it conversational, not salesy\n5. Include a clear but soft call-to-action\n6. Keep it under 300 characters for connection request OR provide a longer follow-up message version\n7. Sound human and authentic\n\n**Output Format:**\nProvide TWO versions:\n\n**Connection Request** (under 300 chars):\n[Short version]\n\n**Follow-up Message** (longer, after they accept):\n[Detailed version with project highlights]",
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 1000
+        }
+      },
+      "id": "ai-generate-message-anthropic",
+      "name": "AI: Generate Message (Anthropic)",
+      "type": "n8n-nodes-base.anthropic",
+      "typeVersion": 1,
+      "position": [1570, 280],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 AI Message Generation\n\n**Choose your AI provider:**\n\n✅ **OpenAI (GPT-4)** - Enabled by default\n- Great creativity\n- Natural language\n- API key required\n\n⚪ **Anthropic (Claude)** - Disabled\n- More professional tone\n- Detailed messages\n- API key required\n\n**Enable one, disable the other**\n\n**What it does:**\n- Personalizes each message\n- References their role/company\n- Highlights your relevant projects\n- Creates 2 versions: short (connection) + long (follow-up)",
+        "height": 400,
+        "width": 340
+      },
+      "id": "ai-note",
+      "name": "AI Provider Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1520, -180]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse AI-generated message and combine with profile data\nconst profile = $('Normalize Profile Data').item.json;\nconst aiResponse = $input.item.json.message?.content || $input.item.json.text || $input.item.json.choices?.[0]?.message?.content || '';\nconst inputParams = $('Parse Input Parameters').item.json;\nconst projects = JSON.parse(inputParams.your_projects);\n\n// Try to split into connection request and follow-up message\nlet connectionRequest = '';\nlet followUpMessage = '';\n\nif (aiResponse.includes('Connection Request')) {\n  const parts = aiResponse.split('Follow-up Message');\n  connectionRequest = parts[0].replace('Connection Request', '').replace(/[*:]/g, '').trim();\n  followUpMessage = parts[1] ? parts[1].replace(/[*:]/g, '').trim() : aiResponse;\n} else {\n  // If no split, use first 280 chars for connection, rest for follow-up\n  connectionRequest = aiResponse.substring(0, 280).trim();\n  followUpMessage = aiResponse;\n}\n\n// Clean up any markdown or extra formatting\nconnectionRequest = connectionRequest.replace(/\\[|\\]/g, '').replace(/\\n\\n/g, '\\n').trim();\nfollowUpMessage = followUpMessage.replace(/\\[|\\]/g, '').replace(/\\n\\n\\n/g, '\\n\\n').trim();\n\nreturn {\n  // Profile data\n  name: profile.name,\n  first_name: profile.name.split(' ')[0],\n  title: profile.title,\n  company: profile.company,\n  location: profile.location,\n  profile_url: profile.profile_url,\n  \n  // Your data\n  your_name: inputParams.your_name,\n  your_role: inputParams.your_role,\n  your_experience: inputParams.your_experience,\n  your_skills: inputParams.your_skills,\n  your_projects: projects,\n  \n  // Generated messages\n  connection_request: connectionRequest,\n  follow_up_message: followUpMessage,\n  \n  // Metadata\n  char_count_connection: connectionRequest.length,\n  char_count_followup: followUpMessage.length,\n  generated_at: new Date().toISOString(),\n  ai_provider: 'openai' // or anthropic depending on which is enabled\n};"
+      },
+      "id": "format-final-output",
+      "name": "Format Final Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1790, 200]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "multiplex",
+        "options": {}
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate All Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [2010, 200]
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": "=linkedin_hr_{{ $('Parse Input Parameters').item.json.company_name }}_{{ new Date().toISOString().split('T')[0] }}.json"
+        }
+      },
+      "id": "export-json",
+      "name": "Export to JSON",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [2230, 120]
+    },
+    {
+      "parameters": {
+        "operation": "toCsv",
+        "options": {
+          "fileName": "=linkedin_hr_{{ $('Parse Input Parameters').item.json.company_name }}_{{ new Date().toISOString().split('T')[0] }}.csv"
+        }
+      },
+      "id": "export-csv",
+      "name": "Export to CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [2230, 280]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"company\": \"{{ $('Parse Input Parameters').item.json.company_name }}\",\n  \"total_profiles\": {{ $json.length || 0 }},\n  \"profiles\": {{ JSON.stringify($json) }},\n  \"export_files\": {\n    \"json\": \"linkedin_hr_{{ $('Parse Input Parameters').item.json.company_name }}_{{ new Date().toISOString().split('T')[0] }}.json\",\n    \"csv\": \"linkedin_hr_{{ $('Parse Input Parameters').item.json.company_name }}_{{ new Date().toISOString().split('T')[0] }}.csv\"\n  },\n  \"message\": \"Successfully found {{ $json.length || 0 }} HR contacts with personalized messages!\"\n}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2450, 200]
+    },
+    {
+      "parameters": {
+        "content": "## 📤 Export Options\n\n**Formats:**\n✅ JSON - Complete data with messages\n✅ CSV - Spreadsheet format\n\n**Files Include:**\n- Name, Title, Company, Location\n- LinkedIn Profile URL\n- Your profile/projects info\n- Connection request (short)\n- Follow-up message (detailed)\n- Metadata (timestamps, AI provider)\n\n**File naming:**\n`linkedin_hr_CompanyName_2025-01-15.json`",
+        "height": 320,
+        "width": 300
+      },
+      "id": "export-note",
+      "name": "Export Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2180, -120]
+    },
+    {
+      "parameters": {
+        "content": "## 🎯 Quick Start Guide\n\n**1. Setup (One-time)**\n- Get Google Custom Search API key (free)\n- Optional: Get Proxycurl API key (10-15 free credits)\n- Get OpenAI or Anthropic API key\n- Add credentials to n8n\n\n**2. Prepare Your Data**\n- List your projects with descriptions\n- Your skills and experience\n- Your target role\n\n**3. Run Workflow**\n- Send POST request with company name\n- Wait for results (30-60 seconds)\n- Get JSON/CSV with all contacts + messages\n\n**4. Review & Send**\n- Review generated messages\n- Customize if needed\n- Send connection requests\n- Use follow-up messages after acceptance\n\n**Tips:**\n- Start with 10-20 results\n- Test messages before bulk sending\n- Respect LinkedIn's connection limits\n- Personalize further for best results",
+        "height": 600,
+        "width": 360
+      },
+      "id": "quick-start-note",
+      "name": "Quick Start Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2540, -180]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"Workflow failed\",\n  \"details\": \"{{ $json.message || 'Unknown error' }}\",\n  \"company\": \"{{ $('Parse Input Parameters').item.json.company_name }}\"\n}",
+        "responseCode": 500
+      },
+      "id": "webhook-error",
+      "name": "Webhook Response: Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1570, 450]
+    }
+  ],
+  "connections": {
+    "Webhook: Start Search": {
+      "main": [
+        [
+          {
+            "node": "Parse Input Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input Parameters": {
+      "main": [
+        [
+          {
+            "node": "Google: Search LinkedIn Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google: Search LinkedIn Profiles": {
+      "main": [
+        [
+          {
+            "node": "Parse Google Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Google Results": {
+      "main": [
+        [
+          {
+            "node": "Normalize Profile Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Profile Data": {
+      "main": [
+        [
+          {
+            "node": "Filter HR Roles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter HR Roles": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Message (OpenAI)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI: Generate Message (Anthropic)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response: Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Message (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Message (Anthropic)": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Output": {
+      "main": [
+        [
+          {
+            "node": "Aggregate All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate All Results": {
+      "main": [
+        [
+          {
+            "node": "Export to JSON",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Export to CSV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Webhook Response: Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "linkedin-hr-finder-improved"
+  },
+  "tags": ["linkedin", "hr", "outreach", "ai", "automation"]
+}
