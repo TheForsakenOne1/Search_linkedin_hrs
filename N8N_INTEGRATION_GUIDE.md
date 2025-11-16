@@ -13,17 +13,27 @@ Complete guide for integrating the LinkedIn HR scraper with n8n for automated me
 
 ## Overview
 
-This integration provides two workflow options:
+This integration provides THREE workflow options:
 
-1. **Python-first Workflow** (Recommended)
+### ⭐ NEW: **Improved LinkedIn HR Finder** (HIGHLY RECOMMENDED)
+   - **Just enter company name** - Simplest input!
+   - Uses **free Google Custom Search API** (100/day)
+   - **AI-powered personalization** with GPT-4/Claude
+   - **Auto-includes your projects** in messages
+   - **No browser automation** - More reliable
+   - See full guide: [IMPROVED_WORKFLOW_GUIDE.md](IMPROVED_WORKFLOW_GUIDE.md)
+
+### 1. **Python-first Workflow**
    - Scrape → Generate → Export workflow file
    - Import into n8n for review and sending
    - Maximum control and safety
 
-2. **n8n-native Workflow**
+### 2. **n8n-native Workflow**
    - Trigger n8n from scraper
    - Generate messages in n8n
    - Auto-send or manual review
+
+> **💡 TIP:** For most users, the **Improved LinkedIn HR Finder** workflow is the best choice. It's easier to set up, uses free APIs, and produces better results.
 
 ## Prerequisites
 
@@ -52,6 +62,36 @@ n8n start
 Access n8n at: `http://localhost:5678`
 
 ## Setup
+
+### Quick Start: Improved Workflow (Recommended)
+
+**For the new Improved LinkedIn HR Finder workflow:**
+
+1. **Get API Keys (Free tiers available):**
+   - [Google Custom Search API](https://console.cloud.google.com) - 100 free/day
+   - [OpenAI API](https://platform.openai.com) or [Anthropic API](https://console.anthropic.com)
+
+2. **Import workflow:**
+   ```bash
+   # Open n8n, import: n8n_workflows/linkedin_hr_finder_improved.json
+   ```
+
+3. **Configure credentials in n8n**
+
+4. **Test it:**
+   ```bash
+   curl -X POST http://localhost:5678/webhook/linkedin-hr-finder \
+     -H "Content-Type: application/json" \
+     -d '{"company_name": "Google"}'
+   ```
+
+📖 **Full setup guide:** [IMPROVED_WORKFLOW_GUIDE.md](IMPROVED_WORKFLOW_GUIDE.md)
+
+---
+
+### Traditional Setup: Python Workflows
+
+**For Python-based workflows:**
 
 ### Step 1: Install Python Dependencies
 

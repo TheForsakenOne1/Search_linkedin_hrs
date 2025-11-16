@@ -1,0 +1,35 @@
+{
+  "_comment": "Example request for the Improved LinkedIn HR Finder workflow",
+  "_usage": "curl -X POST http://localhost:5678/webhook/linkedin-hr-finder -H 'Content-Type: application/json' -d @example_request.json",
+
+  "company_name": "Google",
+  "max_results": 20,
+
+  "your_name": "John Doe",
+  "your_role": "Full-Stack Software Engineer",
+  "your_experience": "5 years",
+  "your_skills": "Python, React, Node.js, AWS, Docker, Kubernetes, PostgreSQL, MongoDB",
+
+  "your_projects": [
+    {
+      "name": "E-Commerce Platform",
+      "description": "Built scalable e-commerce platform serving 100,000+ daily active users with 99.9% uptime, handling $10M+ in annual transactions",
+      "tech": "React, Node.js, PostgreSQL, Redis, AWS Lambda, Docker, Kubernetes"
+    },
+    {
+      "name": "AI-Powered Chatbot System",
+      "description": "Developed intelligent customer service bot that reduced support tickets by 40% and improved response time by 60%",
+      "tech": "Python, OpenAI GPT-4, FastAPI, LangChain, PostgreSQL, Redis"
+    },
+    {
+      "name": "Real-time Analytics Dashboard",
+      "description": "Created real-time analytics dashboard processing 1 million+ events per day with sub-second latency",
+      "tech": "React, D3.js, Apache Kafka, ClickHouse, WebSocket, Docker"
+    },
+    {
+      "name": "Microservices Architecture",
+      "description": "Led migration from monolith to microservices architecture supporting 50+ developers and 10M+ API calls daily",
+      "tech": "Node.js, Python, gRPC, Kubernetes, Istio, Prometheus, Grafana"
+    }
+  ]
+}
