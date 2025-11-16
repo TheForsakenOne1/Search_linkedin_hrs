@@ -5,6 +5,7 @@ import { Linkedin, Github, ExternalLink, Sparkles, Zap, Shield } from 'lucide-re
 import type { SearchParams, SearchResponse } from '@/lib/types'
 import SearchForm from '@/components/SearchForm'
 import ResultsDisplay from '@/components/ResultsDisplay'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
@@ -168,7 +169,7 @@ export default function Home() {
 
           {/* Right Column - Results */}
           <div className="lg:col-span-2 space-y-6">
-            {error && (
+            {error && !isLoading && (
               <div className="stripe-card p-5 border-l-4 border-error-500 bg-error-50 animate-slide-up">
                 <div className="flex items-start space-x-3">
                   <div className="bg-error-100 rounded-lg p-2">
@@ -182,9 +183,13 @@ export default function Home() {
               </div>
             )}
 
-            <div className="animate-fade-in">
-              <ResultsDisplay results={results} />
-            </div>
+            {isLoading ? (
+              <LoadingSkeleton />
+            ) : (
+              <div className="animate-fade-in">
+                <ResultsDisplay results={results} />
+              </div>
+            )}
           </div>
         </div>
       </main>
