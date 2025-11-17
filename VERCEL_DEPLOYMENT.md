@@ -36,8 +36,8 @@ This guide will help you deploy the LinkedIn HR Finder UI to Vercel in minutes.
 5. **Add Environment Variable**
    - Click "Environment Variables"
    - Add:
-     - **Name**: `NEXT_PUBLIC_N8N_WEBHOOK_URL`
-     - **Value**: Your n8n webhook URL (e.g., `https://your-n8n-instance.com/webhook/linkedin-hr-finder`)
+     - **Name**: `N8N_WEBHOOK_URL`
+     - **Value**: Your n8n webhook URL (e.g., `https://your-n8n.app.n8n.cloud/webhook/linkedin-hr-finder`)
    - Click "Add"
 
 6. **Deploy**
@@ -73,9 +73,9 @@ This guide will help you deploy the LinkedIn HR Finder UI to Vercel in minutes.
 
 5. **Add environment variable**
    ```bash
-   vercel env add NEXT_PUBLIC_N8N_WEBHOOK_URL
+   vercel env add N8N_WEBHOOK_URL
    ```
-   - Paste your n8n webhook URL when prompted
+   - Paste your n8n webhook URL when prompted (e.g., `https://your-n8n.app.n8n.cloud/webhook/linkedin-hr-finder`)
 
 6. **Deploy to production**
    ```bash
@@ -103,7 +103,7 @@ This guide will help you deploy the LinkedIn HR Finder UI to Vercel in minutes.
 ## Environment Variables
 
 ### Required:
-- `NEXT_PUBLIC_N8N_WEBHOOK_URL` - Your n8n webhook endpoint
+- `N8N_WEBHOOK_URL` - Your n8n webhook endpoint (e.g., `https://your-n8n.app.n8n.cloud/webhook/linkedin-hr-finder`)
 
 ### To Update Environment Variables:
 1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
@@ -112,8 +112,8 @@ This guide will help you deploy the LinkedIn HR Finder UI to Vercel in minutes.
 
 Or via CLI:
 ```bash
-vercel env rm NEXT_PUBLIC_N8N_WEBHOOK_URL production
-vercel env add NEXT_PUBLIC_N8N_WEBHOOK_URL production
+vercel env rm N8N_WEBHOOK_URL production
+vercel env add N8N_WEBHOOK_URL production
 vercel --prod
 ```
 
@@ -136,11 +136,12 @@ To set up auto-deployment:
 - Run `npm install` locally first to verify
 
 ### Environment Variable Not Working
-**Error**: `NEXT_PUBLIC_N8N_WEBHOOK_URL is undefined`
+**Error**: `N8N_WEBHOOK_URL is undefined`
 - **Fix**:
-  1. Ensure variable name starts with `NEXT_PUBLIC_`
+  1. Ensure variable name is exactly `N8N_WEBHOOK_URL`
   2. Redeploy after adding env vars
   3. Check variable is set for "Production" environment
+  4. Verify the webhook URL is correct
 
 ### API Calls Failing (CORS)
 **Error**: CORS policy blocking requests
@@ -192,7 +193,7 @@ Edit `vercel.json` in the `linkedin-hr-finder-ui` directory:
   "framework": "nextjs",
   "regions": ["iad1"],
   "env": {
-    "NEXT_PUBLIC_N8N_WEBHOOK_URL": "@n8n_webhook_url"
+    "N8N_WEBHOOK_URL": "@n8n_webhook_url"
   }
 }
 ```
