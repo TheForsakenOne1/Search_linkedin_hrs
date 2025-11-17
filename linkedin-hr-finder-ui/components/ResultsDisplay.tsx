@@ -77,38 +77,46 @@ export default function ResultsDisplay({ results }: ResultsDisplayProps) {
 
   return (
     <div className="space-y-6">
-      {/* Summary Header - Stripe Style */}
-      <div className="stripe-card overflow-hidden animate-slide-up">
-        <div className="bg-gradient-to-br from-stripe-500 via-stripe-600 to-stripe-700 p-6 text-white">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl shadow-lg">
-                <Building2 className="h-7 w-7" />
+      {/* Summary Header - Professional Green Theme */}
+      <div className="stripe-card overflow-hidden animate-slide-up shadow-brand-lg">
+        <div className="relative bg-gradient-to-br from-brand-600 via-brand-500 to-accent-600 p-8 text-white overflow-hidden">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0" style={{
+              backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+              backgroundSize: '24px 24px'
+            }}></div>
+          </div>
+
+          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-start gap-5">
+              <div className="bg-white/20 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/20">
+                <Building2 className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold mb-1.5">{results.company}</h2>
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm border border-white/30">
-                    {results.total_profiles} contact{results.total_profiles !== 1 ? 's' : ''}
+                <h2 className="text-3xl font-bold mb-2.5 tracking-tight">{results.company}</h2>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold bg-white/25 backdrop-blur-sm border border-white/30 shadow-lg">
+                    {results.total_profiles} contact{results.total_profiles !== 1 ? 's' : ''} found
                   </span>
                   {results.message && (
-                    <span className="text-stripe-100 text-sm hidden sm:inline">• {results.message}</span>
+                    <span className="text-brand-50 text-sm font-medium hidden sm:inline">• {results.message}</span>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2.5">
+            <div className="flex gap-3">
               <button
                 onClick={handleDownloadJSON}
-                className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 px-4 py-2.5 rounded-lg text-sm font-medium flex items-center transition-all duration-200 hover:shadow-lg shadow-stripe"
+                className="group bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 px-5 py-3 rounded-xl text-sm font-bold flex items-center transition-all duration-200 hover:shadow-2xl shadow-lg hover:scale-105"
               >
                 <Download className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                 <span>JSON</span>
               </button>
               <button
                 onClick={handleDownloadCSV}
-                className="group bg-white hover:bg-white/90 text-stripe-600 px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center transition-all duration-200 shadow-stripe hover:shadow-stripe-lg"
+                className="group bg-white hover:bg-neutral-50 text-brand-700 px-5 py-3 rounded-xl text-sm font-bold flex items-center transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 <Download className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                 <span>CSV</span>
@@ -118,15 +126,15 @@ export default function ResultsDisplay({ results }: ResultsDisplayProps) {
         </div>
 
         {/* Quick Stats Bar */}
-        <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-t border-gray-100">
+        <div className="bg-gradient-to-r from-brand-50/50 via-white to-accent-50/50 px-8 py-5 border-t border-brand-100">
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-success-500 animate-pulse"></div>
-                <span className="text-gray-600">AI-generated messages ready</span>
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-success-500 animate-pulse shadow-lg shadow-success-500/50"></div>
+                <span className="text-neutral-700 font-semibold">AI-generated messages ready</span>
               </div>
-              <span className="text-gray-400 hidden md:inline">•</span>
-              <span className="text-gray-500 hidden md:inline">Click cards to copy messages</span>
+              <span className="text-neutral-400 hidden md:inline">•</span>
+              <span className="text-neutral-600 hidden md:inline font-medium">Click cards to copy messages</span>
             </div>
           </div>
         </div>

@@ -3,23 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --stripe-purple: #635bff;
-  --stripe-purple-dark: #5145cd;
-  --stripe-bg: #f6f9fc;
-  --stripe-text: #1a1f36;
-  --stripe-text-light: #8792a2;
-  --stripe-border: #e3e8ee;
+  --brand-green: #10b981;
+  --brand-green-dark: #059669;
+  --brand-green-light: #34d399;
+  --accent-teal: #14b8a6;
+  --bg-primary: #fafafa;
+  --bg-secondary: #f0fdf5;
+  --text-primary: #171717;
+  --text-secondary: #525252;
+  --text-tertiary: #737373;
+  --border-primary: #e5e5e5;
+  --border-secondary: #d4d4d4;
 }
 
 body {
-  background: var(--stripe-bg);
-  color: var(--stripe-text);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  text-rendering: optimizeLegibility;
 }
 
-/* Stripe-like animations */
+/* Professional animations */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -30,29 +37,43 @@ body {
 }
 
 .animate-shimmer {
-  animation: shimmer 2s infinite;
-  background: linear-gradient(to right, #f6f9fc 4%, #e3f0ff 25%, #f6f9fc 36%);
+  animation: shimmer 2.5s infinite;
+  background: linear-gradient(to right, #fafafa 4%, #dcfce8 25%, #fafafa 36%);
   background-size: 1000px 100%;
 }
 
-/* Stripe-inspired custom scrollbar */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+  }
+}
+
+.animate-glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Professional custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f6f9fc;
+  background: #fafafa;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 5px;
-  border: 2px solid #f6f9fc;
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  border-radius: 8px;
+  border: 2px solid #fafafa;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
 }
 
 /* Custom scrollbar for specific elements */
@@ -65,50 +86,55 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  border-radius: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
 }
 
-/* Stripe-style form inputs */
+/* Professional form inputs and components */
 @layer components {
   .stripe-input {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-lg text-sm;
-    @apply focus:border-stripe-500 focus:ring-2 focus:ring-stripe-100 focus:outline-none;
+    @apply w-full px-4 py-3.5 border-2 border-neutral-200 rounded-xl text-sm font-medium;
+    @apply focus:border-brand-500 focus:ring-4 focus:ring-brand-100 focus:outline-none;
     @apply transition-all duration-200;
-    @apply bg-white shadow-stripe;
+    @apply bg-white shadow-sm hover:border-brand-300;
+    @apply placeholder:text-neutral-400;
   }
 
   .stripe-button {
-    @apply px-6 py-3 rounded-lg font-medium text-sm;
+    @apply px-6 py-3.5 rounded-xl font-bold text-sm;
     @apply transition-all duration-200;
-    @apply shadow-stripe hover:shadow-stripe-lg;
-    @apply active:scale-[0.98];
+    @apply shadow-lg hover:shadow-xl;
+    @apply active:scale-[0.97];
   }
 
   .stripe-button-primary {
-    @apply stripe-button bg-stripe-500 text-white;
-    @apply hover:bg-stripe-600;
-    @apply disabled:bg-gray-300 disabled:cursor-not-allowed;
+    @apply stripe-button;
+    @apply bg-gradient-to-r from-brand-500 to-brand-600;
+    @apply hover:from-brand-600 hover:to-brand-700;
+    @apply text-white shadow-brand hover:shadow-brand-lg;
+    @apply disabled:from-neutral-300 disabled:to-neutral-300 disabled:cursor-not-allowed;
   }
 
   .stripe-button-secondary {
-    @apply stripe-button bg-white text-gray-700 border border-gray-200;
-    @apply hover:bg-gray-50 hover:border-gray-300;
+    @apply stripe-button bg-white text-neutral-700 border-2 border-neutral-200;
+    @apply hover:bg-neutral-50 hover:border-neutral-300;
+    @apply shadow-sm hover:shadow-md;
   }
 
   .stripe-card {
-    @apply bg-white rounded-xl shadow-stripe;
-    @apply border border-gray-100;
-    @apply transition-all duration-200;
-    @apply hover:shadow-stripe-lg;
+    @apply bg-white rounded-2xl shadow-lg;
+    @apply border border-neutral-100;
+    @apply transition-all duration-300;
+    @apply hover:shadow-xl;
   }
 
   .stripe-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+    @apply shadow-sm;
   }
 }
 

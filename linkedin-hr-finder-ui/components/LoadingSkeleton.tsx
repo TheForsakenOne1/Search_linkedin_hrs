@@ -6,23 +6,31 @@ export default function LoadingSkeleton() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Loading Header */}
-      <div className="stripe-card overflow-hidden">
-        <div className="bg-gradient-to-br from-stripe-500 via-stripe-600 to-stripe-700 p-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl animate-pulse">
-              <Sparkles className="h-7 w-7 text-white" />
+      <div className="stripe-card overflow-hidden shadow-brand-lg">
+        <div className="relative bg-gradient-to-br from-brand-600 via-brand-500 to-accent-600 p-8 overflow-hidden">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0" style={{
+              backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+              backgroundSize: '24px 24px'
+            }}></div>
+          </div>
+
+          <div className="relative flex items-center gap-5">
+            <div className="bg-white/20 backdrop-blur-md p-4 rounded-2xl animate-pulse border border-white/20 shadow-2xl">
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
             <div className="flex-1">
-              <div className="h-7 bg-white/20 rounded-lg w-48 mb-2 animate-pulse"></div>
-              <div className="h-5 bg-white/10 rounded-lg w-32 animate-pulse"></div>
+              <div className="h-8 bg-white/25 rounded-xl w-56 mb-3 animate-pulse"></div>
+              <div className="h-6 bg-white/15 rounded-lg w-40 animate-pulse"></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-gray-50 to-white px-6 py-4 border-t border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-stripe-500 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+        <div className="bg-gradient-to-r from-brand-50/50 via-white to-accent-50/50 px-8 py-5 border-t border-brand-100">
+          <div className="flex items-center gap-2.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-success-500 animate-pulse shadow-lg shadow-success-500/50"></div>
+            <div className="h-4 bg-neutral-200 rounded w-56 animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -102,13 +110,13 @@ export default function LoadingSkeleton() {
       </div>
 
       {/* Searching Message */}
-      <div className="text-center py-8 animate-pulse">
-        <div className="inline-flex items-center gap-3 text-stripe-600">
-          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div className="text-center py-10 animate-pulse">
+        <div className="inline-flex items-center gap-4 bg-gradient-to-r from-brand-50 to-accent-50 px-8 py-4 rounded-2xl border border-brand-200 shadow-brand">
+          <svg className="animate-spin h-6 w-6 text-brand-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span className="text-sm font-medium">Searching LinkedIn profiles and generating personalized messages...</span>
+          <span className="text-sm font-bold text-brand-700">Searching LinkedIn profiles and generating personalized messages...</span>
         </div>
       </div>
     </div>
